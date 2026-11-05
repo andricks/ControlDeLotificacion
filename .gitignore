@@ -1,0 +1,34 @@
+# Secretos
+.env
+*.env
+!.env.example
+
+# Archivos de usuarios y PDFs generados
+storage/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+
+# Node
+node_modules/
+dist/
+
+# Claude Code (config personal)
+.claude/settings.local.json
+
+# SO / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Fotos/escaneos de documentos reales (datos personales)
+documentos-muestra/

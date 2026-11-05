@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+/* Tokens del sistema de diseño (skill diseno-frontend). Usar solo estos colores. */
+@theme {
+  --color-primario: #1e3a5f;
+  --color-primario-hover: #2c5282;
+  --color-primario-suave: #e8eef6;
+  --color-acento: #2f855a;
+  --color-acento-suave: #e6f4ea;
+  --color-alerta: #b7791f;
+  --color-alerta-suave: #fdf3e1;
+  --color-peligro: #c53030;
+  --color-peligro-suave: #fdecec;
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primario;
+  }
+}
+
+.numero {
+  font-variant-numeric: tabular-nums;
+}

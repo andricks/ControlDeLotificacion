@@ -1,0 +1,67 @@
+# Blueprint de Render: backend (FastAPI) + frontend (sitio estático). Guía: docs/DESPLIEGUE.md
+# El navegador solo habla con el frontend; este reenvía /api/* al backend (mismo origen →
+# la cookie de sesión SameSite=Strict funciona y no hay CORS entre dominios).
+services:
+  - type: web
+    name: facturas-api
+    runtime: python
+    rootDir: backend
+    plan: starter # "free" se duerme tras 15 min sin uso (primera petición ~1 min)
+    region: oregon
+    buildCommand: pip install . && python -m app.migrar
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips="*"
+    healthCheckPath: /api/v1/salud
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.7
+      - key: ENTORNO
+        value: produccion
+      - key: COOKIE_SEGURA
+        value: "true"
+      - key: SESION_HORAS
+        value: "8"
+      - key: ZONA_HORARIA
+        value: America/Guatemala
+      - key: MONGODB_DB
+        value: facturas
+      - key: JWT_SECRETO
+        generateValue: true
+      # Se piden al crear el Blueprint (no van en git):
+      - key: MONGODB_URI
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: ADMIN_CORREOS
+        sync: false
+      - key: CORS_ORIGENES # URL https del frontend, p. ej. https://facturas-web.onrender.com
+        sync: false
+
+  - type: web
+    name: facturas-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+    routes:
+      # El orden importa: primero la API, luego la SPA.
+      - type: rewrite
+        source: /api/*
+        destination: https://facturas-api.onrender.com/api/*
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin

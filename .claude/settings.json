@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "PowerShell(python .claude/scripts/validar.py*)",
+      "PowerShell(python .claude/skills/leer-pdf/scripts/extraer_pdf.py *)",
+      "PowerShell(pytest*)",
+      "PowerShell(python -m pytest*)",
+      "PowerShell(ruff *)",
+      "PowerShell(python -m ruff *)",
+      "PowerShell(npm run *)",
+      "PowerShell(npx tsc *)",
+      "PowerShell(npx eslint *)",
+      "PowerShell(npx vitest *)",
+      "PowerShell(pip list*)",
+      "PowerShell(pip show *)"
+    ],
+    "ask": [
+      "PowerShell(python -m app.migrar*)",
+      "PowerShell(pip install *)",
+      "PowerShell(npm install *)",
+      "PowerShell(Remove-Item *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./backend/.env)",
+      "Read(./frontend/.env)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "python \"$env:CLAUDE_PROJECT_DIR\\.claude\\hooks\\post_edit.py\"",
+            "timeout": 60,
+            "statusMessage": "Validando archivo editado..."
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "python \"$env:CLAUDE_PROJECT_DIR\\.claude\\hooks\\session_start.py\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
